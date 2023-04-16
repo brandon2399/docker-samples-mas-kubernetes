@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  labels:
+    app: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+      - name: backend
+        image: brandon2399/repo_samples_dockerhub_backend:latest
+        ports:
+        - containerPort: 3000
+        env:
+        - name: MONGODB_URI
+          value: "mongodb+srv://brandon2399:n42P4lGo4Ov6xCo1@cluster0.mjtuyhm.mongodb.net/?retryWrites=true&w=majority/TodoApp"
+        - name: PORT
+          value: "3000"
+      - name: mongo
+        image: mongo:4.2.0
+        ports:
+        - containerPort: 27017
+        env:
+        - name: MONGODB_URI
+          value: TodoApp
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+spec:
+  selector:
+    app: backend
+  ports:
+    - name: http
+      port: 3000
+      targetPort: 3000

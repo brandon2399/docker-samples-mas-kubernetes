@@ -1,0 +1,10 @@
+{
+  "test":{
+    "PORT": 3000,
+    "MONGODB_URI": "mongodb+srv://brandon2399:n42P4lGo4Ov6xCo1@cluster0.mjtuyhm.mongodb.net/?retryWrites=true&w=majority/TodoAppTest"
+  },
+  "development":{
+    "PORT": 3000,
+    "MONGODB_URI": "mongodb+srv://brandon2399:n42P4lGo4Ov6xCo1@cluster0.mjtuyhm.mongodb.net/?retryWrites=true&w=majority/TodoApp"
+  }
+}

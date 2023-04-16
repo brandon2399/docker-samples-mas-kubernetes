@@ -1,0 +1,29 @@
+version: "3"
+services:
+  sonarqube:
+    image: sonarqube:8.2-community
+    restart: always
+    ports:
+      - 9000:9000
+    volumes:
+      - ./sonarqube_data/data:/opt/sonarqube/data
+      - ./sonarqube_logs/logs:/opt/sonarqube/logs
+      - ./sonarqube_extensions/extensions:/opt/sonarqube/extensions
+      - /etc/localtime:/etc/localtime
+      - /etc/timezone:/etc/timezone
+    networks:
+      sonarqube_community_network:
+        aliases: 
+          - sonarqube_net
+volumes:
+  sonarqube_data: {}
+  sonarqube_logs: {}
+  sonarqube_extensions: {}
+networks:
+  sonarqube_community_network:
+    driver: bridge
+    ipam:
+      driver: default
+
+
+#sonar-scanner.bat -D"sonar.projectKey=samples-dockerhub" -D"sonar.sources=." -D"sonar.host.url=http://localhost:9000" -D"sonar.login=186acf60143840115fc7f4f113a44b5d6408cd34"

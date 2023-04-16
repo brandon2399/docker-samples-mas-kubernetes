@@ -1,0 +1,8 @@
+location          = "eastus"
+resource_group_name = "AZRG-SAMTEL-US-DEV"
+tenant_id         = "cbc2c381-2f2e-4d93-91d1-506c9316ace7"
+subscription_id   = "0fb6adf1-1ac2-42c7-8eed-664c52d0d682"
+client_id         = "<Azure client ID>"
+client_secret     = "<Azure client secret>"
+backend_image     = "brandon2399/repo_samples_dockerhub_backend:v2"
+frontend_image    = "brandon2399/repo_samples_dockerhub_frontend:v4"

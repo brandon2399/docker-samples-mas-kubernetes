@@ -1,0 +1,130 @@
+trigger:
+- main
+
+variables:
+  myDockerHubUsername: brandon2399
+  myDockerHubPassword: $(myDockerHubPassword)
+  SonarQube_hostUrl: 'http://localhost:9000'
+  SonarQube_loginName: '$(myDockerHubPassword)'
+  SonarQube_loginPassword: '$(myPassword)'
+  ADO-AgentPool: Default
+      
+
+jobs:
+- job: build
+  pool: $(ADO-AgentPool)
+  displayName: Build Job
+  steps:
+  - task: Docker@2
+    inputs:
+      containerRegistry: 'dockerhub'
+      repository: 'brandon2399/repo_samples_dockerhub_frontend'
+      command: 'build'
+      Dockerfile: '**/frontend/Dockerfile'
+      tags: 'latest'
+    displayName: 'Docker build frontend'
+
+  - task: Docker@2
+    inputs:
+      containerRegistry: 'dockerhub'
+      repository: 'brandon2399/repo_samples_dockerhub_backend'
+      command: 'build'
+      Dockerfile: '**/frontend/Dockerfile'
+      tags: 'latest'
+    displayName: 'Docker build frontend'
+
+  - task: SonarQubePrepare@4
+    inputs:
+      SonarQube: 'SonarQubeConnection'
+      projectKey: 'samples-dockerhub'
+      projectName: 'samples-dockerhub'
+      projectVersion: '1.0.0'
+      scannerMode: 'CLI'
+      extraProperties: |
+        sonar.host.url=http://localhost:9000
+        sonar.login=$(sonarToken)
+        sonar.docker.image=repo_samples_dockerhub_frontend:latest
+        sonar.docker.image=repo_samples_dockerhub_backend:latest
+        sonar.sources=.
+        sonar.exclusions=**/node_modules/**,**/dist/**
+        sonar.coverage.exclusions=**/node_modules/**,**/dist/**
+        sonar.typescript.lcov.reportPaths=coverage/lcov.info
+        sonar.projectKey=samples-dockerhub
+        sonar.projectName=samples-dockerhub
+        sonar.projectVersion=1.0.0
+
+  - task: SonarQubeAnalyze@4
+    inputs:
+      SonarQube: 'SonarQubeConnection'
+      projectKey: 'samples-dockerhub'
+      projectName: 'samples-dockerhub'
+      projectVersion: '1.0.0'
+      scannerMode: 'CLI'
+      cliVersion: '4.4.0'
+      cliScannerType: 'docker'
+      extraProperties: |
+        sonar.host.url=http://localhost:9000
+        sonar.login=$(sonarToken)
+        sonar.docker.image=repo_samples_dockerhub_frontend:latest
+        sonar.docker.image=repo_samples_dockerhub_backend:latest
+        sonar.sources=.
+        sonar.exclusions=**/node_modules/**,**/dist/**
+        sonar.coverage.exclusions=**/node_modules/**,**/dist/**
+        sonar.typescript.lcov.reportPaths=coverage/lcov.info
+        sonar.projectKey=samples-dockerhub
+        sonar.projectName=samples-dockerhub
+        sonar.projectVersion=1.0.0
+      condition: succeededOrFailed()
+
+  - task: Docker@2
+    inputs:
+      containerRegistry: 'dockerhub'
+      command: 'login'
+      username: '$(myDockerHubUsername)'
+      password: '$(myDockerHubPassword)'
+    displayName: 'Docker Hub Login'
+
+  - task: Docker@2
+    inputs:
+      containerRegistry: 'dockerhub'
+      repository: 'brandon2399/repo_samples_dockerhub_frontend'
+      command: 'push'
+      tags: 'latest'
+    displayName: 'push dockerhub image frontend'
+      
+  - task: Docker@2
+    inputs:
+      containerRegistry: 'dockerhub'
+      repository: 'brandon2399/repo_samples_dockerhub_backend'
+      command: 'push'
+      tags: 'latest'
+    displayName: 'push dockerhub image backend'
+
+  - task: PowerShell@2
+    inputs:
+      targetType: 'inline'
+      script: |
+        for ($i = 1; $i -le 10; $i++) {
+          Write-Host "Hola Mundo $i"
+          Start-Sleep -Seconds 1
+        }
+    displayName: print_hola_mundo_x10
+
+  - task: PowerShell@2
+    inputs:
+      targetType: 'inline'
+      script: |
+        for ($i = 1; $i -le 10; $i++) {
+          $filename = "$(Get-Date -Format 'yyyy-MM-dd')_$i.txt"
+          New-Item -Path . -Name $filename -ItemType File
+        }
+    displayName: files_fecha
+
+  - task: PowerShell@2
+    inputs:
+      targetType: 'inline'
+      script: |
+        Get-ChildItem -Path . -Filter *.txt | ForEach-Object { Write-Host $_.Name }
+    displayName: print_fecha_x10
+
+  
